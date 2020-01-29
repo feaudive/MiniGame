@@ -10,13 +10,23 @@ import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import fr.feaudive.packetmanager.PacketInputManager;
+import fr.feaudive.packetmanager.PacketOutputManager;
+import net.minecraft.server.v1_8_R3.PlayerConnection;
 
 public class MiniGamePlugin extends JavaPlugin {
 	
@@ -34,13 +44,30 @@ public class MiniGamePlugin extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-		//TODO packetManager : tout les joueurs connectées + tout les futurs connectées
+		registerEvents(new Listener() {
+		@EventHandler
+		public void onJoin(PlayerJoinEvent event) {
+			registerPacketListener(event.getPlayer());
+		}
+
+		@EventHandler
+		public void onLeave(PlayerQuitEvent event) {
+			unregisterPacketListener(event.getPlayer());
+		}
+		
+		@EventHandler
+		public void onKicked(PlayerKickEvent event) {
+			unregisterPacketListener(event.getPlayer());
+		}
+		
+	}, this);
 		currentGame = games.get(random.nextInt(games.size()));
 	}
 	
 	@Override
 	public void onDisable() {
-		games.clear(); 
+		games.clear();
+		for(Player player : Bukkit.getOnlinePlayers()) unregisterPacketListener(player);
 	}
 	
 	public static void changeCurrentGame() { //TODO voter entre reedo et deux jeux randoms
@@ -93,6 +120,21 @@ public class MiniGamePlugin extends JavaPlugin {
 	    } catch (Exception e) {
 			throw new IllegalPluginAccessException(e.toString());
 		}
+	}
+	
+	private static void registerPacketListener(Player player) {
+		PlayerConnection playerConnection  = new PacketOutputManager(player);
+		try{((CraftPlayer) player).getHandle().playerConnection = playerConnection;}catch(Exception e) {}
+		try{playerConnection.networkManager.channel.pipeline().addBefore("packet_handler", "packet_listener", new PacketInputManager(player));}catch(Exception e) {}
+	}
+	
+	private static void unregisterPacketListener(Player player) {
+		try {
+			PacketOutputManager pom = PacketOutputManager.getPacketManager(player);
+			((CraftPlayer) player).getHandle().playerConnection = pom.getOldPlayerConnection();
+			PacketInputManager.removePacketManager(player);
+			PacketOutputManager.removePacketManager(player);
+		} catch(Exception e) {}
 	}
 	
 	public static void callEvent(Event event) {
