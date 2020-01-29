@@ -35,7 +35,6 @@ public class MiniGamePlugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		//TODO packetManager : tout les joueurs connectées + tout les futurs connectées
-		//TODO ajouter tout les jeux dans games
 		currentGame = games.get(random.nextInt(games.size()));
 	}
 	
@@ -43,12 +42,8 @@ public class MiniGamePlugin extends JavaPlugin {
 	public void onDisable() {
 		games.clear(); 
 	}
-
-	public static void addGame(MiniGame game) {
-		games.add(game);
-	}
 	
-	private static void changeCurrentGame() { //TODO
+	public static void changeCurrentGame() { //TODO voter entre reedo et deux jeux randoms
 		changeCurrentGame(games.get(random.nextInt(games.size())));
 	}
 	

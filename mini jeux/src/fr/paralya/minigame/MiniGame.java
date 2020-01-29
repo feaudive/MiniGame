@@ -5,7 +5,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 public abstract class MiniGame {
-
+	
+	private boolean enable = false;
 	private final Set<MiniGameListener> listeners = new HashSet<MiniGameListener>();
 	private final Set<MiniGameTimedTask> runnables = new HashSet<MiniGameTimedTask>();
 
@@ -34,25 +35,34 @@ public abstract class MiniGame {
 	return this;
 }
 	
-	protected final void load() {
+	public final void load() {
 		onLoad();
+		enable = true;
 	}
 	
-	protected final void unload() {
+	public final void unload() {
 		listeners.forEach(l -> removeListeners(l));
 		listeners.clear();
 		runnables.clear();
 		onUnload();
+		enable = false;
+	}
+	
+	public final void finish() {
+		enable = false;
 	}
 	
 	//TODO return true et change le jeu si fini
-	public final void runTick() {
-		Iterator<MiniGameTimedTask> it = runnables.iterator();
-		while (it.hasNext()) {
-			MiniGameTimedTask task = (MiniGameTimedTask) it.next();
-			if(task.step())
-				it.remove();
+	public final boolean runTick() {
+		if(enable) {
+			Iterator<MiniGameTimedTask> it = runnables.iterator();
+			while (it.hasNext()) {
+				MiniGameTimedTask task = (MiniGameTimedTask) it.next();
+				if(task.step())
+					it.remove();
+			}
 		}
+		return enable;
 	}
 
 	/**
