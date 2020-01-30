@@ -61,6 +61,7 @@ public class MiniGamePlugin extends JavaPlugin {
 		}
 		
 	}, this);
+		Bukkit.getOnlinePlayers().forEach((p) -> registerPacketListener(p)); 
 		currentGame = games.get(random.nextInt(games.size()));
 	}
 	
