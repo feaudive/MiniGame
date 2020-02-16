@@ -10,30 +10,20 @@ import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.feaudive.packetmanager.PacketEvent;
-import fr.feaudive.packetmanager.PacketInputManager;
-import fr.feaudive.packetmanager.PacketOutputManager;
-import net.minecraft.server.v1_8_R3.PlayerConnection;
 
 public class MiniGamePlugin extends JavaPlugin {
 	
 	private static MiniGamePlugin INSTANCE;
-	private static List<MiniGame> games = Arrays.asList(new TestGame()); //mettre ici tout les Minigames (ou le seul en cour de test)
-	private static MiniGame currentGame;
+	private static List<MiniGame> games = Arrays.asList(); //mettre ici tout les Minigames (ou le seul en cour de test)
 	private static GameTimer taskManager = null;
 	private static Random random = new Random();
 	
@@ -49,7 +39,7 @@ public class MiniGamePlugin extends JavaPlugin {
 			taskManager.runTaskTimer(INSTANCE, 0, 1);
 		}
 		PacketEvent.registerAllPlayerAutomatically(this);
-		currentGame = games.get(random.nextInt(games.size()));
+		MiniGame currentGame = games.get(random.nextInt(games.size()));
 		taskManager.setGame(currentGame);
 		currentGame.load();
 	}
@@ -57,13 +47,6 @@ public class MiniGamePlugin extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		
-	}
-	
-	static void changeCurrentGame(MiniGame game) {
-		currentGame.unload();
-		currentGame = game;
-		taskManager.setGame(currentGame);
-		currentGame.load();
 	}
 	
 	static MiniGame getRandomGame() {

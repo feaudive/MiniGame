@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
-
 public abstract class MiniGame {
 	
 	private boolean enable = false;
