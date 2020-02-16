@@ -8,9 +8,11 @@ public class GameTimer extends BukkitRunnable {
 	
 	@Override
 	public void run() {
-		if(game != null) if(!game.runTick()) MiniGamePlugin.changeCurrentGame();
+		if(game != null) if(!game.runTick()) MiniGamePlugin.changeCurrentGame(new WaitForNewGame());
 	}
 	
-	
+	public void setGame(MiniGame game) {
+		this.game = game;
+	}
 	
 }

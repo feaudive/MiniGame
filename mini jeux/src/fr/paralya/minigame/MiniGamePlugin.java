@@ -32,36 +32,42 @@ import net.minecraft.server.v1_8_R3.PlayerConnection;
 public class MiniGamePlugin extends JavaPlugin {
 	
 	private static MiniGamePlugin INSTANCE;
-	private static List<MiniGame> games = Arrays.asList(); //mettre ici tout les Minigames (ou le seul en cour de test)
+	private static List<MiniGame> games = Arrays.asList(new TestGame()); //mettre ici tout les Minigames (ou le seul en cour de test)
 	private static MiniGame currentGame;
-	private static GameTimer taskManager = new GameTimer();
+	private static GameTimer taskManager = null;
 	private static Random random = new Random();
 	
 	public MiniGamePlugin() {
 		super();
 		INSTANCE = this;
-		taskManager.runTaskTimer(INSTANCE, 0, 1);
 	}
 	
 	@Override
 	public void onEnable() {
-		PacketEvent.registerAllPlayerAutomatically(this); 
+		if(taskManager == null) {
+			taskManager = new GameTimer();
+			taskManager.runTaskTimer(INSTANCE, 0, 1);
+		}
+		PacketEvent.registerAllPlayerAutomatically(this);
 		currentGame = games.get(random.nextInt(games.size()));
+		taskManager.setGame(currentGame);
+		currentGame.load();
 	}
 	
 	@Override
 	public void onDisable() {
-		games.clear();
+		
 	}
 	
-	public static void changeCurrentGame() { //TODO voter entre reedo et deux jeux randoms
-		changeCurrentGame(games.get(random.nextInt(games.size())));
-	}
-	
-	private static void changeCurrentGame(MiniGame game) {
+	static void changeCurrentGame(MiniGame game) {
 		currentGame.unload();
 		currentGame = game;
+		taskManager.setGame(currentGame);
 		currentGame.load();
+	}
+	
+	static MiniGame getRandomGame() {
+		return games.get(random.nextInt(games.size()));
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

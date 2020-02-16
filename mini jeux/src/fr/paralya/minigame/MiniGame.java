@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
+
 public abstract class MiniGame {
 	
 	private boolean enable = false;
@@ -19,7 +21,6 @@ public abstract class MiniGame {
 	public final MiniGame addTimedTask(MiniGameTimedTask timedTask) {
 		if(timedTask.getGame() != this) throw new IllegalArgumentException();
 		this.runnables.add(timedTask);
-		//TODO
 		return this;
 	}
 	
