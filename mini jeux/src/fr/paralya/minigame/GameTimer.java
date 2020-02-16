@@ -26,8 +26,8 @@ public class GameTimer extends BukkitRunnable {
 		} else {
 			timeVoteLeft--;
 			if(timeVoteLeft == 0) {
-				Bukkit.broadcastMessage("Le peuple à choisi");
 				game = game1; //TODO chois selon le vote
+				Bukkit.broadcastMessage("Le peuple à choisi, le jeu serra : " + game.getName());
 				game.load();
 			}
 		}

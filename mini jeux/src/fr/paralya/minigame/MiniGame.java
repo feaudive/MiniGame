@@ -9,6 +9,11 @@ public abstract class MiniGame {
 	private boolean enable = false;
 	private final Set<MiniGameListener> listeners = new HashSet<MiniGameListener>();
 	private final Set<MiniGameTimedTask> runnables = new HashSet<MiniGameTimedTask>();
+	private final String name;
+	
+	public MiniGame(String name) {
+		this.name = name;
+	}
 
 	public final MiniGame addListeners(MiniGameListener listener) {
 		this.listeners.add(listener);
@@ -29,10 +34,14 @@ public abstract class MiniGame {
 	}
 
 	public final MiniGame removeTimedTask(MiniGameTimedTask timedTask) {
-	if(timedTask.getGame() != this) throw new IllegalArgumentException();
-	this.runnables.remove(timedTask);
-	return this;
-}
+		if(timedTask.getGame() != this) throw new IllegalArgumentException();
+		this.runnables.remove(timedTask);
+		return this;
+	}
+	
+	public String getName() {
+		return name;
+	}
 	
 	public final void load() {
 		onLoad();
